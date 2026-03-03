@@ -2,7 +2,7 @@
 # Demonstrates using the after_reasoning lifecycle event for cleanup and logging
 
 config:
-   agent_name: "AfterReasoning"
+   developer_name: "AfterReasoning"
    agent_label: "AfterReasoning"
    agent_type: "AgentforceEmployeeAgent"
    description: "Demonstrates reasoning lifecycle events"

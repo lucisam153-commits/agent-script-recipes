@@ -8,7 +8,7 @@ system:
    instructions: "You integrate with external systems and handle API responses gracefully."
 
 config:
-    agent_name: "ExternalAPIIntegration"
+    developer_name: "ExternalAPIIntegration"
     agent_label: "ExternalAPIIntegration"
     agent_type: "AgentforceEmployeeAgent"
     description: "Demonstrates integration with external systems using flows and Apex"

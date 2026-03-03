@@ -2,7 +2,7 @@
 # This agent demonstrates running code after actions complete
 
 config:
-   agent_name: "ActionCallbacks"
+   developer_name: "ActionCallbacks"
    agent_label: "ActionCallbacks"
    agent_type: "AgentforceEmployeeAgent"
    description: "Processes payments with post-action callbacks"

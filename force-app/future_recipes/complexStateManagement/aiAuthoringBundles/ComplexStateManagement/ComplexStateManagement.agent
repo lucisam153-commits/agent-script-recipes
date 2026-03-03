@@ -2,7 +2,7 @@
 # This agent demonstrates complex object and list operations for sophisticated state management
 
 config:
-   agent_name: "ComplexStateManagement"
+   developer_name: "ComplexStateManagement"
    agent_label: "ComplexStateManagement"
    agent_type: "AgentforceEmployeeAgent"
    description: "Manages a todo list with complex state operations"

@@ -6,7 +6,7 @@ system:
    instructions: "You are an advanced agent that synthesizes multiple data sources for intelligent recommendations."
 
 config:
-    agent_name: "AdvancedReasoningPatterns"
+    developer_name: "AdvancedReasoningPatterns"
     agent_label: "AdvancedReasoningPatterns"
     agent_type: "AgentforceEmployeeAgent"
     description: "Demonstrates advanced reasoning with dynamic instructions and complex logic"

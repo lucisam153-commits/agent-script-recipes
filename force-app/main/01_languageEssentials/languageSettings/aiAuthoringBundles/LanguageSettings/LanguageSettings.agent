@@ -9,7 +9,7 @@ system:
    instructions: "You are a multilingual assistant. Respond in the user's preferred language."
 
 config:
-    agent_name: "LanguageSettings"
+    developer_name: "LanguageSettings"
     agent_label: "LanguageSettings"
     agent_type: "AgentforceEmployeeAgent"
     description: "Demonstrates language configuration and localization"

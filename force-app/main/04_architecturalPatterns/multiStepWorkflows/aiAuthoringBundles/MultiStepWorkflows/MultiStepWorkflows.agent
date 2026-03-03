@@ -7,7 +7,7 @@ system:
         error: "Something went wrong during onboarding. Let me help you recover."
 
 config:
-    agent_name: "MultiStepWorkflows"
+    developer_name: "MultiStepWorkflows"
     agent_label: "MultiStepWorkflows"
     agent_type: "AgentforceEmployeeAgent"
     description: "Handles customer onboarding through a multi-step workflow"

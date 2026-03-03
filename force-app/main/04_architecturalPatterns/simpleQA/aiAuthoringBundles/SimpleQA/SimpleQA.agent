@@ -2,7 +2,7 @@
 # Demonstrates creating a single-topic Q&A agent with clear instructions and knowledge retrieval
 
 config:
-   agent_name: "SimpleQA"
+   developer_name: "SimpleQA"
    agent_label: "SimpleQA"
    agent_type: "AgentforceEmployeeAgent"
    description: "Answers common questions about products and services"

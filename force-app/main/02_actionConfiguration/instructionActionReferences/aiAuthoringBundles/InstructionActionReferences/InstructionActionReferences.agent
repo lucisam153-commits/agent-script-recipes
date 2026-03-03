@@ -2,7 +2,7 @@
 # Demonstrates how to reference and guide action usage directly within reasoning instructions
 
 config:
-   agent_name: "InstructionActionReferences"
+   developer_name: "InstructionActionReferences"
    agent_label: "InstructionActionReferences"
    agent_type: "AgentforceEmployeeAgent"
    description: "Demonstrates embedding action references in instructions"
