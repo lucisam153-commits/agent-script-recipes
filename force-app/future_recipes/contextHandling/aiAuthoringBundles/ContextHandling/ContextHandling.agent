@@ -2,7 +2,7 @@
 # This agent demonstrates using linked variables from external context
 
 config:
-   agent_name: "ContextHandling"
+   developer_name: "ContextHandling"
    agent_label: "ContextHandling"
    agent_type: "AgentforceEmployeeAgent"
    description: "Uses platform context for personalized experiences"

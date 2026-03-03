@@ -1,5 +1,5 @@
 config:
-   agent_name: "SafetyAndGuardrails"
+   developer_name: "SafetyAndGuardrails"
    agent_label: "SafetyAndGuardrails"
    agent_type: "AgentforceEmployeeAgent"
    description: "Handles sensitive data deletion with safety guardrails"

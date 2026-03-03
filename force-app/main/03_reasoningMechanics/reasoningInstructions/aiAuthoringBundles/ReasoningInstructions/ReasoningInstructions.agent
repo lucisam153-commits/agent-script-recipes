@@ -2,7 +2,7 @@
 # This agent demonstrates how to build instructions dynamically using procedures
 
 config:
-   agent_name: "ReasoningInstructions"
+   developer_name: "ReasoningInstructions"
    agent_label: "ReasoningInstructions"
    agent_type: "AgentforceEmployeeAgent"
    description: "Checks order status and provides dynamic instructions based on order state"

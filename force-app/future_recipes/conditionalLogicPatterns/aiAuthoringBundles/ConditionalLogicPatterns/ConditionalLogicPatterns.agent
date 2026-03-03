@@ -2,7 +2,7 @@
 # This agent demonstrates comprehensive conditional logic patterns
 
 config:
-   agent_name: "ConditionalLogicPatterns"
+   developer_name: "ConditionalLogicPatterns"
    agent_label: "ConditionalLogicPatterns"
    agent_type: "AgentforceEmployeeAgent"
    description: "Evaluates loan applications using complex conditional logic"

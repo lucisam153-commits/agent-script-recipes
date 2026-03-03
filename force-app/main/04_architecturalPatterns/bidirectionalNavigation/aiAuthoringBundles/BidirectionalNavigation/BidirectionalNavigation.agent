@@ -2,7 +2,7 @@
 # Demonstrates bidirectional navigation where topics delegate to specialists and receive control back
 
 config:
-   agent_name: "BidirectionalNavigation"
+   developer_name: "BidirectionalNavigation"
    agent_label: "BidirectionalNavigation"
    agent_type: "AgentforceEmployeeAgent"
    description: "Demonstrates bidirectional navigation pattern (handoff and return)"

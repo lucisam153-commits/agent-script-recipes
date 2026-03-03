@@ -2,7 +2,7 @@
 # Demonstrates how to override action descriptions based on context for better LLM action selection
 
 config:
-   agent_name: "ActionDescriptionOverrides"
+   developer_name: "ActionDescriptionOverrides"
    agent_label: "ActionDescriptionOverrides"
    agent_type: "AgentforceEmployeeAgent"
    description: "Demonstrates overriding action descriptions based on context"
