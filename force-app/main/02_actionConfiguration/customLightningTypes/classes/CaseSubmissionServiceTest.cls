@@ -7,7 +7,7 @@ private class CaseSubmissionServiceTest {
     @IsTest
     static void testSubmitCaseSingleRequest() {
         // Create test input
-        CaseInput input = new CaseInput();
+        CaseSubmissionService.CaseInput input = new CaseSubmissionService.CaseInput();
         input.subject = 'Login page not loading';
         input.priority = 'High';
         input.category = 'Technical';
@@ -84,7 +84,7 @@ private class CaseSubmissionServiceTest {
         // Create multiple test requests for bulk testing
         List<CaseSubmissionService.SubmitCaseRequest> requests = new List<CaseSubmissionService.SubmitCaseRequest>();
 
-        CaseInput input1 = new CaseInput();
+        CaseSubmissionService.CaseInput input1 = new CaseSubmissionService.CaseInput();
         input1.subject = 'Billing discrepancy';
         input1.priority = 'Critical';
         input1.category = 'Billing';
@@ -93,7 +93,7 @@ private class CaseSubmissionServiceTest {
         request1.case_data = input1;
         requests.add(request1);
 
-        CaseInput input2 = new CaseInput();
+        CaseSubmissionService.CaseInput input2 = new CaseSubmissionService.CaseInput();
         input2.subject = 'Feature request: dark mode';
         input2.priority = 'Low';
         input2.category = 'Feature Request';
@@ -126,7 +126,7 @@ private class CaseSubmissionServiceTest {
     @IsTest
     static void testSubmitCaseWithDefaults() {
         // Test with minimal input to verify defaults
-        CaseInput input = new CaseInput();
+        CaseSubmissionService.CaseInput input = new CaseSubmissionService.CaseInput();
         input.subject = 'General inquiry';
 
         CaseSubmissionService.SubmitCaseRequest request = new CaseSubmissionService.SubmitCaseRequest();

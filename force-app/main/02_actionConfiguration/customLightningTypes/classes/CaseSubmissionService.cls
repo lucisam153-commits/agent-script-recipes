@@ -1,9 +1,59 @@
 /**
  * @description Service for submitting support cases via Custom Lightning Types.
- * Uses top-level CaseInput and CaseResult classes as CLT data shapes
- * so that Lightning Type Bundles can resolve them in a single deploy.
+ * Inner classes CaseInput and CaseResult are the CLT data shapes referenced
+ * by caseInput/schema.json and caseResult/schema.json respectively.
  */
 public with sharing class CaseSubmissionService {
+    /**
+     * @description Data shape for CLT input — referenced by caseInput/schema.json
+     */
+    public class CaseInput {
+        @InvocableVariable(
+            label='Subject'
+            description='Case subject'
+            required=true
+        )
+        public String subject;
+
+        @InvocableVariable(label='Priority' description='Case priority')
+        public String priority;
+
+        @InvocableVariable(label='Category' description='Case category')
+        public String category;
+
+        @InvocableVariable(label='Description' description='Case description')
+        public String description;
+    }
+
+    /**
+     * @description Data shape for CLT output — referenced by caseResult/schema.json
+     */
+    public class CaseResult {
+        @InvocableVariable(label='Case Number')
+        public String caseNumber;
+
+        @InvocableVariable(label='Subject')
+        public String subject;
+
+        @InvocableVariable(label='Priority')
+        public String priority;
+
+        @InvocableVariable(label='Category')
+        public String category;
+
+        @InvocableVariable(label='Description')
+        public String description;
+
+        @InvocableVariable(label='Status')
+        public String status;
+
+        @InvocableVariable(label='Created Date')
+        public String createdDate;
+
+        @InvocableVariable(label='Estimated Response')
+        public String estimatedResponse;
+    }
+
     /**
      * @description Invocable request wrapper — field names must match AgentScript action input names
      */

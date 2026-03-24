@@ -47,14 +47,16 @@ AgentScript action                    Lightning Type Bundle             LWC Comp
 complex_data_type_name:              caseInput/                        caseInputEditor/
   "c__caseInput"      ──────────►      schema.json                      js-meta.xml:
   is_user_input: True                    → @apexClassType/                 target: lightning__AgentforceInput
-                                           c__CaseInput                    targetType: c__caseInput
+                                           c__CaseSubmissionService$        targetType: c__caseInput
+                                           CaseInput
                                        editor.json
                                          → c/caseInputEditor
 
 complex_data_type_name:              caseResult/                       caseResultRenderer/
   "c__caseResult"     ──────────►      schema.json                      js-meta.xml:
   is_displayable: True                   → @apexClassType/                 target: lightning__AgentforceOutput
-                                           c__CaseResult                   sourceType: c__caseResult
+                                           c__CaseSubmissionService$        sourceType: c__caseResult
+                                           CaseResult
                                        renderer.json
                                          → c/caseResultRenderer
 ```
@@ -93,28 +95,31 @@ instructions:->
 
 ### Apex Data Shapes
 
-The CLT data shapes are defined as **top-level Apex classes** (not inner classes). This is important because Lightning Type Bundles must resolve the Apex class reference at deploy time — top-level classes can be resolved within the same deployment transaction, while inner classes cannot.
+The CLT data shapes are defined as **inner classes** of `CaseSubmissionService`. The Lightning Type `schema.json` references them using `$` syntax (e.g., `c__CaseSubmissionService$CaseInput`). This keeps the data shapes co-located with the service that uses them.
 
 ```apex
-// CaseInput.cls — top-level class referenced by caseInput/schema.json
-public class CaseInput {
-    @InvocableVariable(label='Subject' description='Case subject' required=true)
-    public String subject;
-    @InvocableVariable(label='Priority' description='Case priority')
-    public String priority;
-    @InvocableVariable(label='Category' description='Case category')
-    public String category;
-    @InvocableVariable(label='Description' description='Case description')
-    public String description;
-}
-```
+public with sharing class CaseSubmissionService {
+    // Inner class referenced by caseInput/schema.json
+    public class CaseInput {
+        @InvocableVariable(
+            label='Subject'
+            description='Case subject'
+            required=true
+        )
+        public String subject;
+        @InvocableVariable(label='Priority' description='Case priority')
+        public String priority;
+        @InvocableVariable(label='Category' description='Case category')
+        public String category;
+        @InvocableVariable(label='Description' description='Case description')
+        public String description;
+    }
 
-The `CaseSubmissionService` references these top-level classes in its request/response wrappers:
-
-```apex
-public class SubmitCaseRequest {
-    @InvocableVariable(required=true)
-    public CaseInput case_data;
+    // Request wrapper — field names match AgentScript action input names
+    public class SubmitCaseRequest {
+        @InvocableVariable(required=true)
+        public CaseInput case_data;
+    }
 }
 ```
 
@@ -151,7 +156,7 @@ actions:
 {
     "title": "Case Input",
     "description": "Support case submission data",
-    "lightning:type": "@apexClassType/c__CaseInput"
+    "lightning:type": "@apexClassType/c__CaseSubmissionService$CaseInput"
 }
 ```
 
@@ -251,7 +256,7 @@ When the user says "I need to submit a support case":
 
 ## Notes
 
-CLT data shape classes (`CaseInput`, `CaseResult`) must be **top-level Apex classes**, not inner classes. Lightning Type Bundles resolve the `@apexClassType/` reference at deploy time, and inner class references (using `$` syntax) cannot be resolved within the same deployment transaction.
+When referencing inner Apex classes in `schema.json`, use `$` as the separator (e.g., `@apexClassType/c__CaseSubmissionService$CaseInput`). Using `.` instead of `$` will cause a "We couldn't find the Apex class" deploy error.
 
 ## Testing
 
