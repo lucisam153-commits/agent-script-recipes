@@ -3,6 +3,8 @@ import { api, LightningElement } from 'lwc';
 export default class CaseInputEditor extends LightningElement {
     @api readOnly = false;
 
+    _value = {};
+
     @api
     get value() {
         return this._value;

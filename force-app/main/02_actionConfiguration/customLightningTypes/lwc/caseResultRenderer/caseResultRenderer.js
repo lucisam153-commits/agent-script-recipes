@@ -3,24 +3,32 @@ import { LightningElement, api } from 'lwc';
 export default class CaseResultRenderer extends LightningElement {
     @api value;
 
-    caseNumber;
-    subject;
-    priority;
-    description;
-    status;
-    createdDate;
-    estimatedResponse;
+    get caseNumber() {
+        return this.value?.caseNumber ?? '';
+    }
 
-    connectedCallback() {
-        if (this.value) {
-            this.caseNumber = this.value.caseNumber || '';
-            this.subject = this.value.subject || '';
-            this.priority = this.value.priority || '';
-            this.description = this.value.description || '';
-            this.status = this.value.status || '';
-            this.createdDate = this.value.createdDate || '';
-            this.estimatedResponse = this.value.estimatedResponse || '';
-        }
+    get subject() {
+        return this.value?.subject ?? '';
+    }
+
+    get priority() {
+        return this.value?.priority ?? '';
+    }
+
+    get description() {
+        return this.value?.description ?? '';
+    }
+
+    get status() {
+        return this.value?.status ?? '';
+    }
+
+    get createdDate() {
+        return this.value?.createdDate ?? '';
+    }
+
+    get estimatedResponse() {
+        return this.value?.estimatedResponse ?? '';
     }
 
     get priorityClass() {
