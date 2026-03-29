@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Flow that runs in system mode without sharing - vulnerable to context escalation</description>
+    <interviewLabel>SystemModeDangerFlow</interviewLabel>
+    <processType>AutoLaunchedFlow</processType>
+    <!-- VULNERABILITY: System mode without sharing -->
+    <runInMode>SystemModeWithoutSharing</runInMode>
+    <startElementReference>StartElement</startElementReference>
+    
+    <actionCalls>
+        <actionCall>
+            <name>UpdateRecords</name>
+            <actionName>UpdateRecords</actionName>
+            <actionType>updateRecords</actionType>
+            <connector>
+                <targetReference>UpdateRecords</targetReference>
+            </connector>
+        </actionCall>
+    </actionCalls>
+    
+    <start>
+        <connector>
+            <targetReference>UpdateRecords</targetReference>
+        </connector>
+        <label>StartElement</label>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+    </start>
+    
+    <recordUpdates>
+        <recordUpdate>
+            <name>UpdateRecords</name>
+            <filters>
+                <!-- VULNERABILITY: Dynamic filter using AI variable -->
+                <filter>
+                    <field>Id</field>
+                    <operator>EqualTo</operator>
+                    <value>{!aiVariable.userId}</value>
+                </filter>
+            </filters>
+            <inputAssignments>
+                <inputAssignment>
+                    <field>Description</field>
+                    <value>{!$Flow.CurrentDateTime}</value>
+                </inputAssignment>
+            </inputAssignments>
+        </recordUpdate>
+    </recordUpdates>
+</Flow>

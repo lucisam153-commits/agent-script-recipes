@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Agent xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Agent vulnerable to ForcedLeak-style indirect prompt injection</description>
+    <masterLabel>ForcedLeakAgent</masterLabel>
+    
+    <!-- Simulating ForcedLeak vulnerability -->
+    <promptTemplates>
+        <promptTemplate>
+            <masterLabel>ProcessLeadDescription</masterLabel>
+            <prompt>Analyze this lead description and extract contact information: {!lead.Description}</prompt>
+            <!-- VULNERABILITY: No output escaping, can inject malicious commands -->
+        </promptTemplate>
+    </promptTemplates>
+    
+    <agentActions>
+        <agentAction>
+            <actionType>InvokeFlow</actionType>
+            <flowName>ExportDataFlow</flowName>
+            <!-- VULNERABILITY: No HITL confirmation for data export -->
+            <confirmationRequired>false</confirmationRequired>
+        </agentAction>
+        
+        <agentAction>
+            <actionType>ExecuteApex</actionType>
+            <apexClassName>DataExporter</apexClassName>
+            <methodName>exportSensitiveData</methodName>
+        </agentAction>
+    </agentActions>
+    
+    <!-- VULNERABILITY: Trusted URL allowlist bypass -->
+    <httpCallouts>
+        <httpCallout>
+            <name>ExternalAPI</name>
+            <endpoint>{!externalEndpoint}</endpoint>
+            <method>POST</method>
+            <!-- Missing Trusted URL validation -->
+        </httpCallout>
+    </httpCallouts>
+</Agent>

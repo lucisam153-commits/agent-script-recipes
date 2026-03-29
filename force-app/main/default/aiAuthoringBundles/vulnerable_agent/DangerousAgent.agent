@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Agent xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Intentionally vulnerable agent with multiple security issues</description>
+    <masterLabel>DangerousAgent</masterLabel>
+    
+    <!-- VULNERABILITY 1: Unescaped AI output in prompt template -->
+    <promptTemplates>
+        <promptTemplate>
+            <masterLabel>UnsafePrompt</masterLabel>
+            <prompt>Generate a SOQL query to fetch all records from Account where Name contains: {!userInput}</prompt>
+            <!-- Missing outputEscaping="true" -->
+        </promptTemplate>
+    </promptTemplates>
+    
+    <agentActions>
+        <agentAction>
+            <actionType>InvokeFlow</actionType>
+            <flowName>SystemModeDangerFlow</flowName>
+            <!-- VULNERABILITY 2: No manual confirmation for state-modifying action -->
+            <confirmationRequired>false</confirmationRequired>
+        </agentAction>
+        
+        <agentAction>
+            <actionType>ExecuteApex</actionType>
+            <apexClassName>DangerousApexController</apexClassName>
+            <methodName>executeDangerousOperation</methodName>
+        </agentAction>
+    </agentActions>
+    
+    <genAiFunctions>
+        <genAiFunction>
+            <name>unsafeVariableBinding</name>
+            <description>Dynamically binds user input to SOQL query</description>
+            <parameters>
+                <parameter>
+                    <name>userId</name>
+                    <type>String</type>
+                    <!-- VULNERABILITY 3: Dynamic variable in SOQL filter -->
+                    <defaultValue>{!currentUser.Id}</defaultValue>
+                </parameter>
+            </parameters>
+        </genAiFunction>
+    </genAiFunctions>
+</Agent>
