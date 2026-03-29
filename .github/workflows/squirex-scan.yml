@@ -1,0 +1,69 @@
+name: SquireX Security Scan
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly scan
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Download SquireX
+      run: |
+        curl -L -o squirex https://github.com/samudralap/squirex-apex-forge/releases/latest/download/squirex-linux-x64
+        chmod +x squirex
+        sudo mv squirex /usr/local/bin/
+        squirex --version
+
+    - name: Run SquireX Community Scan
+      id: scan
+      run: |
+        echo "Running SquireX security scan on force-app directory..."
+        squirex scan -d ./force-app --output json > results.json || true
+        echo "results=$(cat results.json | jq -c .)" >> $GITHUB_OUTPUT
+
+    - name: Run SquireX with SARIF output (if licensed)
+      if: env.SQUIREX_LICENSE_KEY != ''
+      run: |
+        echo "Running licensed SquireX scan with SARIF output..."
+        squirex scan -d ./force-app --sarif results.sarif
+        echo "SARIF file generated: results.sarif"
+
+    - name: Upload SARIF results to GitHub Security
+      if: env.SQUIREX_LICENSE_KEY != '' && always()
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: results.sarif
+
+    - name: Parse and display results
+      if: always()
+      run: |
+        if [ -f results.json ]; then
+          echo "=== SquireX Scan Results ==="
+          cat results.json | jq -r '.vulnerabilities[]? | "\(.severity): \(.ruleId) - \(.message)"' || true
+          echo ""
+          echo "=== Summary ==="
+          cat results.json | jq -r '.summary' || true
+        else
+          echo "No results.json found"
+        fi
+
+    - name: Upload raw results as artifact
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: squirex-results
+        path: |
+          results.json
+          results.sarif
+        retention-days: 7
