@@ -18,26 +18,25 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Download and Install SquireX
+    - name: Download SquireX
       run: |
         curl -L -o squirex https://github.com/samudralap/squirex-apex-forge/releases/latest/download/squirex-linux-x64
         chmod +x squirex
         sudo mv squirex /usr/local/bin/
-        # Check version, but ignore error if it returns non-zero
-        squirex --version || true
+        squirex --version
 
     - name: Run SquireX Community Scan
       id: scan
       run: |
         echo "Running SquireX security scan on force-app directory..."
-        # Running scan and forcing success status to prevent pipeline failure on findings
-        squirex scan -d ./force-app --output json > results.json || echo "Scan completed (may have findings)"
+        squirex scan -d ./force-app --output json > results.json 2>&1 || true
+        cat results.json || echo "No results.json created"
 
     - name: Run SquireX with SARIF output (if licensed)
       if: env.SQUIREX_LICENSE_KEY != ''
       run: |
         echo "Running licensed SquireX scan with SARIF output..."
-        squirex scan -d ./force-app --sarif results.sarif || true
+        squirex scan -d ./force-app --sarif results.sarif
         echo "SARIF file generated: results.sarif"
 
     - name: Upload SARIF results to GitHub Security
@@ -46,14 +45,17 @@ jobs:
       with:
         sarif_file: results.sarif
 
-    - name: Parse and display Scan Results
+    - name: Parse and display results
       if: always()
       run: |
         if [ -f results.json ]; then
           echo "=== SquireX Scan Results ==="
-          cat results.json || echo "No findings to display"
+          cat results.json | jq -r '.vulnerabilities[]? | "\(.severity): \(.ruleId) - \(.message)"' || true
+          echo ""
+          echo "=== Summary ==="
+          cat results.json | jq -r '.summary' || true
         else
-          echo "No results.json found - check binary execution"
+          echo "No results.json found"
         fi
 
     - name: Upload raw results as artifact
