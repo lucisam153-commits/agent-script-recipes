@@ -134,5 +134,5 @@ jobs:
         echo "✅ squirex diagnose - Graph topology analysis"
         echo "✅ squirex diagnose --dump-request - Golden file generation"
         echo "✅ Rule help rendering in GitHub Security Dashboard"
-        echo "✅ All 22 rules now visible (was 9)"
+        echo "✅ All rules now visible (was 9)"
 
