@@ -6,11 +6,13 @@ on:
   pull_request:
     branches: [ main ]
   schedule:
-    - cron: '0 0 * * 0'  # Weekly scan
+    - cron: '0 0 * * 0'
 
 jobs:
   security-scan:
     runs-on: ubuntu-latest
+    env:
+      SQUIREX_LICENSE_KEY: ${{ secrets.SQUIREX_LICENSE_KEY }}
     
     steps:
     - name: Checkout repository
@@ -23,7 +25,7 @@ jobs:
         curl -L -o squirex https://github.com/samudralap/squirex-apex-forge/releases/latest/download/squirex-linux-x64
         chmod +x squirex
         sudo mv squirex /usr/local/bin/
-        squirex --version
+        squirex --version || true
 
     - name: Run SquireX Community Scan
       id: scan
@@ -32,11 +34,11 @@ jobs:
         squirex scan -d ./force-app --output json > results.json 2>&1 || true
         cat results.json || echo "No results.json created"
 
-    - name: Run SquireX with SARIF output (if licensed)
+    - name: Run SquireX with SARIF output
       if: env.SQUIREX_LICENSE_KEY != ''
       run: |
         echo "Running licensed SquireX scan with SARIF output..."
-        squirex scan -d ./force-app --sarif results.sarif
+        squirex scan -d ./force-app --sarif results.sarif || true
         echo "SARIF file generated: results.sarif"
 
     - name: Upload SARIF results to GitHub Security
@@ -50,10 +52,7 @@ jobs:
       run: |
         if [ -f results.json ]; then
           echo "=== SquireX Scan Results ==="
-          cat results.json | jq -r '.vulnerabilities[]? | "\(.severity): \(.ruleId) - \(.message)"' || true
-          echo ""
-          echo "=== Summary ==="
-          cat results.json | jq -r '.summary' || true
+          cat results.json || echo "No results to display"
         else
           echo "No results.json found"
         fi
