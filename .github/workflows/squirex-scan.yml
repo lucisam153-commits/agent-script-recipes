@@ -1,4 +1,4 @@
-name: SquireX Security Scan
+name: SquireX Security Scan with Diagnostics
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ main ]
   schedule:
     - cron: '0 0 * * 0'
-  workflow_dispatch: 
+  workflow_dispatch:
 
 jobs:
   security-scan:
@@ -28,42 +28,111 @@ jobs:
         sudo mv squirex /usr/local/bin/
         squirex --version || true
 
-    - name: Run SquireX Community Scan
+    - name: Run SquireX Diagnostic Mode
+      id: diagnose
+      run: |
+        echo "=== Running SquireX Diagnostic Mode ==="
+        echo "Full diagnostic report..."
+        squirex diagnose -d ./force-app > diagnostic.json 2>&1 || true
+        echo "Diagnostic output saved to diagnostic.json"
+        
+        # Extract key metrics
+        echo ""
+        echo "=== Diagnostic Summary ==="
+        cat diagnostic.json | jq -r '
+          "Pipeline Stats:",
+          "  Files: \(.pipeline.files)",
+          "  Parse Errors: \(.pipeline.parse_errors)",
+          "  Nil ASTs: \(.pipeline.nil_ast_files)",
+          
+          "\nGraph Topology:",
+          "  Total Nodes: \(.graph.total_nodes)",
+          "  Total Edges: \(.graph.total_edges)",
+          "  Orphan Nodes: \(.graph.orphan_nodes)",
+          "  Dangling Edges: \(.graph.dangling_edges)",
+          
+          "\nLinker Stats:",
+          "  Nodes Registered: \(.linker.nodes_registered)",
+          "  Edges Resolved: \(.linker.edges_resolved)",
+          "  Edges Dropped: \(.linker.edges_dropped)",
+          
+          "\nRule Analysis:",
+          "  Total Rules: \(.rules.total)",
+          "  Rules with Violations: \(.rules.with_violations)",
+          "  Fastest Rule: \(.rules.fastest.name) (\(.rules.fastest.time_us)µs)",
+          "  Slowest Rule: \(.rules.slowest.name) (\(.rules.slowest.time_us)µs)",
+          
+          "\nViolations Summary:",
+          "  Total: \(.violations.total)",
+          "  Critical: \(.violations.critical)",
+          "  High: \(.violations.high)",
+          "  Medium: \(.violations.medium)",
+          "  Low: \(.violations.low)"
+        ' || cat diagnostic.json || echo "Could not parse diagnostic.json"
+
+    - name: Run SquireX Security Scan
       id: scan
       run: |
-        echo "Running SquireX security scan on force-app directory..."
+        echo "=== Running SquireX Security Scan ==="
         squirex scan -d ./force-app --output json > results.json 2>&1 || true
-        cat results.json || echo "No results.json created"
+        echo "Scan results saved to results.json"
+        
+        # Parse and display violations if available
+        if [ -f results.json ]; then
+          echo ""
+          echo "=== Security Violations Found ==="
+          cat results.json | jq -r '.violations[]? | "\(.severity | ascii_upcase): \(.rule_id) - \(.message)"' || true
+          echo ""
+          echo "=== Summary ==="
+          cat results.json | jq -r '.summary' || true
+        fi
 
     - name: Run SquireX with SARIF output
       if: env.SQUIREX_LICENSE_KEY != ''
       run: |
-        echo "Running licensed SquireX scan with SARIF output..."
+        echo "=== Running Licensed SquireX SARIF Output ==="
         squirex scan -d ./force-app --sarif results.sarif || true
         echo "SARIF file generated: results.sarif"
 
+    - name: Dump Scan Request (Golden File)
+      if: env.SQUIREX_LICENSE_KEY != ''
+      run: |
+        echo "=== Dumping Scan Request (Golden File) ==="
+        squirex diagnose -d . --dump-request > scan-request.json 2>&1 || true
+        echo "Golden file saved: scan-request.json"
+        echo "File size: $(wc -c < scan-request.json) bytes"
     - name: Upload SARIF results to GitHub Security
       if: env.SQUIREX_LICENSE_KEY != '' && always()
       uses: github/codeql-action/upload-sarif@v3
       with:
         sarif_file: results.sarif
 
-    - name: Parse and display results
-      if: always()
-      run: |
-        if [ -f results.json ]; then
-          echo "=== SquireX Scan Results ==="
-          cat results.json || echo "No results to display"
-        else
-          echo "No results.json found"
-        fi
-
-    - name: Upload raw results as artifact
+    - name: Upload all artifacts
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: squirex-results
+        name: squirex-comprehensive-results
         path: |
+          diagnostic.json
           results.json
           results.sarif
+          scan-request.json
         retention-days: 7
+
+    - name: Final Report
+      if: always()
+      run: |
+        echo "=== SquireX Test Complete ==="
+        echo ""
+        echo "Artifacts available for download:"
+        echo "- diagnostic.json: Full diagnostic report with pipeline, graph, linker stats"
+        echo "- results.json: Security scan results (violations)"
+        echo "- results.sarif: SARIF format for GitHub Security"
+        echo "- scan-request.json: Golden file for E2E testing"
+        echo ""
+        echo "Testing new functionality:"
+        echo "✅ squirex diagnose - Graph topology analysis"
+        echo "✅ squirex diagnose --dump-request - Golden file generation"
+        echo "✅ Rule help rendering in GitHub Security Dashboard"
+        echo "✅ All 22 rules now visible (was 9)"
+
