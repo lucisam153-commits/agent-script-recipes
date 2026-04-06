@@ -4,3 +4,5 @@ This repository contains intentionally vulnerable Salesforce Agentforce/Apex cod
 
 Last updated: 2026-03-29
 Manual trigger for testing.
+
+Test manual trigger
